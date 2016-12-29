@@ -23,7 +23,7 @@ func main() {
 			difficulty %s
 			gaslimit %s
 			gasused %s
-			nonce %llu
+			nonce %#v
 			parenthash %s
 			txhash %s
 			receipthash %s
@@ -32,7 +32,7 @@ func main() {
 			MixDigest %s
 			root %s
 			time %s
-			Transactions %v \n`,
+			Transactions %v `,
 				block.Coinbase.Hex(),
 				block.Number.ToInt(),
 				block.Difficulty.ToInt(),
@@ -50,6 +50,7 @@ func main() {
 				block.Transactions)
 
 			//fmt.Println(block.Transactions)
+
 
 		}
 	}
