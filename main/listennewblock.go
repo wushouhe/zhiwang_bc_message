@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/ethereum/go-ethereum/rpc"
 	"zhiwang_bc_message/geth/json"
-	subscribe "zhiwang_bc_message/geth/subscribe"
+	"zhiwang_bc_message/geth/subscribe"
 	"fmt"
 )
 

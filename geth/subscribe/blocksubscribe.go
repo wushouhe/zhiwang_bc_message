@@ -1,4 +1,4 @@
-package rpc
+package subscribe
 
 import (
 	"time"
