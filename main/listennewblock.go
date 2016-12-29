@@ -19,11 +19,11 @@ func main() {
 
 			fmt.Printf(`
 			coinbase %s
-			number %S
+			number %s
 			difficulty %s
 			gaslimit %s
 			gasused %s
-			nonce %s
+			nonce %llu
 			parenthash %s
 			txhash %s
 			receipthash %s
