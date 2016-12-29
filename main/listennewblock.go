@@ -17,8 +17,37 @@ func main() {
 		select {
 		case block := <-blockChan:
 
-			fmt.Printf("coinbase %s difficulty %s gaslimit %s gasused %s nonce %s parenthash %s txhash %s " +
-				"receipthash %s bloom %s extra %s MixDigest %s root %s time %s Transactions %v \n", block.Coinbase.Hex(), block.Difficulty.ToInt(), block.GasLimit.ToInt(), block.GasUsed.ToInt(), block.Nonce.Uint64(), block.ParentHash.Hex(), block.TxHash.Hex(), block.ReceiptHash.Hex(), block.Bloom.Big(), block.Extra.String(), block.MixDigest.Hex(), block.Root.Hex(), block.Time.ToInt(),block.Transactions)
+			fmt.Printf(`
+			coinbase %s
+			number %S
+			difficulty %s
+			gaslimit %s
+			gasused %s
+			nonce %s
+			parenthash %s
+			txhash %s
+			receipthash %s
+			bloom %s
+			extra %s
+			MixDigest %s
+			root %s
+			time %s
+			Transactions %v \n`,
+				block.Coinbase.Hex(),
+				block.Number.ToInt(),
+				block.Difficulty.ToInt(),
+				block.GasLimit.ToInt(),
+				block.GasUsed.ToInt(),
+				block.Nonce.Uint64(),
+				block.ParentHash.Hex(),
+				block.TxHash.Hex(),
+				block.ReceiptHash.Hex(),
+				block.Bloom.Big(),
+				block.Extra.String(),
+				block.MixDigest.Hex(),
+				block.Root.Hex(),
+				block.Time.ToInt(),
+				block.Transactions)
 
 			//fmt.Println(block.Transactions)
 
