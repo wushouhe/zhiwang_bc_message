@@ -9,6 +9,7 @@ import (
 	"math/big"
 )
 //同步区块
+//call getBlockByNumber error: Post http://172.16.10.163:8545: dial tcp 172.16.10.163:8545: bind: An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full.nil block
 func SyncBlock(client *rpc.Client, blockChan chan *json.JsonHeader, from, to int64) {
 	for i := from; i < to; i++ {
 		go func(num int64) {
@@ -27,7 +28,7 @@ func SyncBlock(client *rpc.Client, blockChan chan *json.JsonHeader, from, to int
 func getBlockByNumber(client *rpc.Client, blockNumber *big.Int) (*json.JsonHeader) {
 	var block json.JsonHeader = json.JsonHeader{}
 	if err := client.CallContext(context.Background(), &block, "eth_getBlockByNumber", toBlockNumArg(blockNumber), true); err != nil {
-		glog.Infof("call getBlockByNumber error: %v", err)
+		fmt.Printf("call getBlockByNumber error: %v", err)
 		return nil
 	}
 	return &block
