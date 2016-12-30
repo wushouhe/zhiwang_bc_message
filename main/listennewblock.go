@@ -10,7 +10,7 @@ import (
 func main() {
 
 	client, _ := rpc.Dial("http://172.16.10.163:8545")
-	blockChan := make(chan *json.JsonHeader)
+	blockChan := make(chan *json.JsonHeader,100)
 	fmt.Println("正在监听new Block.........")
 	subscribe.ListenNewBlock(client, blockChan)
 	for {
