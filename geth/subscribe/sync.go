@@ -9,12 +9,15 @@ import (
 	"math/big"
 )
 
-func SyncBlock(client *rpc.Client, from, to int64) []*json.JsonHeader {
-	blocks := make([]*json.JsonHeader, 0)
+func SyncBlock(client *rpc.Client, blockChan chan *json.JsonHeader, from, to int64) {
+	//blocks := make([]*json.JsonHeader, 0)
 	for i := from; i < to; i++ {
-		blocks = append(blocks, getBlockByNumber(client, big.NewInt(i)))
+		go func() {
+			blockChan <- getBlockByNumber(client, big.NewInt(i))
+		}()
+		//blocks = append(blocks, getBlockByNumber(client, big.NewInt(i)))
 	}
-	return blocks
+	//return blocks
 }
 
 func getBlockByNumber(client *rpc.Client, blockNumber *big.Int) (*json.JsonHeader) {
@@ -32,6 +35,22 @@ func toBlockNumArg(number *big.Int) string {
 	}
 	return fmt.Sprintf("%#x", number)
 }
-func lastBlockNum() {
+
+//chan
+func getLastBlock(client *rpc.Client, blockChan chan *json.JsonHeader) *big.Int {
+	var block json.JsonHeader = json.JsonHeader{}
+	if err := client.CallContext(context.Background(), &block, "eth_getBlockByNumber", toBlockNumArg(nil), true); err != nil {
+		glog.Infof("call getBlockByNumber error: %v", err)
+		return nil
+	}
+
+	go func() {
+		blockChan <- &block
+	}()
+
+	return block.Number.ToInt()
+}
+
+func checkSyncBlock() {
 
 }
