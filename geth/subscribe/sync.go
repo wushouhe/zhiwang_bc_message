@@ -10,14 +10,11 @@ import (
 )
 
 func SyncBlock(client *rpc.Client, blockChan chan *json.JsonHeader, from, to int64) {
-	//blocks := make([]*json.JsonHeader, 0)
 	for i := from; i < to; i++ {
-		go func() {
-			blockChan <- getBlockByNumber(client, big.NewInt(i))
-		}()
-		//blocks = append(blocks, getBlockByNumber(client, big.NewInt(i)))
+		go func(num int64) {
+			blockChan <- getBlockByNumber(client, big.NewInt(num))
+		}(i)
 	}
-	//return blocks
 }
 
 func getBlockByNumber(client *rpc.Client, blockNumber *big.Int) (*json.JsonHeader) {

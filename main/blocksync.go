@@ -4,7 +4,7 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 	"zhiwang_bc_message/geth/subscribe"
 	"zhiwang_bc_message/geth/json"
-	"fmt"
+	"zhiwang_bc_message/geth/utils"
 )
 
 func main() {
@@ -12,6 +12,6 @@ func main() {
 	blockChan := make(chan *json.JsonHeader)
 	subscribe.SyncBlock(client, blockChan, 1, 10)
 	for v := range blockChan {
-		fmt.Printf(" %v \n", v)
+		utils.PrintBlock(v)
 	}
 }
