@@ -85,7 +85,14 @@ func BlockDetail(client *rpc.Client, blockIdChan chan []string, blockChan chan *
 					glog.Infof("BlockDetail error: %v", err)
 					return
 				}
-				blockChan <- block
+				Loop:
+				for {
+					select {
+					case blockChan <- block:
+						break Loop
+					}
+				}
+
 			}
 		}
 	}
