@@ -11,11 +11,11 @@ import (
 func main() {
 	client, _ := rpc.Dial("http://139.196.178.168:8545")
 	blockChan := make(chan *json.JsonHeader, 100)
-	subscribe.SyncBlock(client, blockChan, 1, 10000)
+	//subscribe.BatchRequest(client,blockChan,0,99)
+	subscribe.FillBlockRange(client,blockChan,0,200)
+
 	for block := range blockChan {
 		//utils.PrintBlock(block)
-		if block == nil {
-			fmt.Println("nil block")
-		}
+		fmt.Printf("%s \n",block.Number.ToInt())
 	}
 }

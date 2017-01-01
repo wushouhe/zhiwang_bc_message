@@ -30,7 +30,7 @@ filterId 订阅ID
 blockIdChan new blockID 队列
  */
 func GetNewBlockIds(client *rpc.Client, filterId string, blockIdChan chan []string) {
-	timer := time.NewTimer(time.Second * 10)
+	timer := time.NewTimer(time.Second * 0)
 	var result []string = make([]string, 0)
 	for {
 		select {
