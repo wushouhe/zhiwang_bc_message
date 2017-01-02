@@ -5,6 +5,7 @@ import (
 	"zhiwang_bc_message/geth/json"
 	"zhiwang_bc_message/geth/subscribe"
 	"fmt"
+	"zhiwang_bc_message/geth/blockdb"
 )
 
 func main() {
@@ -13,10 +14,11 @@ func main() {
 	blockChan := make(chan *json.JsonHeader,100)
 	fmt.Println("正在监听new Block.........")
 	subscribe.ListenNewBlock(client, blockChan)
+	db:=blockdb.NewDB()
 	for {
 		select {
 		case block := <-blockChan:
-
+			blockdb.InsertBlock(db,block)
 			fmt.Printf(`
 			coinbase %s
 			number %s
@@ -49,7 +51,7 @@ func main() {
 				block.Time.ToInt(),
 				block.Transactions)
 
-			//fmt.Println(block.Transactions)
+			fmt.Println(block.Transactions)
 
 
 		}

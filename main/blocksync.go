@@ -5,17 +5,17 @@ import (
 	"zhiwang_bc_message/geth/subscribe"
 	"zhiwang_bc_message/geth/json"
 	//"zhiwang_bc_message/geth/utils"
+	"zhiwang_bc_message/geth/blockdb"
 	"fmt"
 )
 
 func main() {
 	client, _ := rpc.Dial("http://139.196.178.168:8545")
 	blockChan := make(chan *json.JsonHeader, 100)
-	subscribe.SyncBlock(client, blockChan, 1, 10000)
+	db := blockdb.NewDB()
+	subscribe.SyncBlocks(client, db, blockChan)
 	for block := range blockChan {
-		//utils.PrintBlock(block)
-		if block == nil {
-			fmt.Println("nil block")
-		}
+		fmt.Printf("%v \n",block)
+		blockdb.InsertBlock(db, block)
 	}
 }

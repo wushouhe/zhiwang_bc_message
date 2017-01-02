@@ -21,6 +21,9 @@ func PrintBlock(block *json.JsonHeader) {
 			MixDigest %s
 			root %s
 			time %s
+			size %#x
+			totalDifficultyv %#x
+			hash %s
 			Transactions %v `,
 		block.Coinbase.Hex(),
 		block.Number.ToInt(),
@@ -36,6 +39,9 @@ func PrintBlock(block *json.JsonHeader) {
 		block.MixDigest.Hex(),
 		block.Root.Hex(),
 		block.Time.ToInt(),
+		block.Size.ToInt(),
+		block.TotalDifficulty.ToInt(),
+		block.Hash.Hex(),
 		block.Transactions)
 }
 
