@@ -36,7 +36,7 @@ CREATE TABLE `blocks` (
   `hash` varchar(255) NOT NULL,
   `parenthash` varchar(255) DEFAULT NULL,
   `nonce` varchar(255) DEFAULT NULL,
-  `number` varchar(255) DEFAULT NULL,
+  `number` bigint(255) DEFAULT NULL,
   `extraData` varchar(255) DEFAULT NULL,
   `gasLimit` varchar(255) DEFAULT NULL,
   `gasUsed` varchar(255) DEFAULT NULL,
