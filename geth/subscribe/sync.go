@@ -55,18 +55,27 @@ func SyncAndSubscribBlock(client *rpc.Client, blockChan chan *json.JsonHeader) {
 	FillBlockRange(client, blockChan, int64(0), lastBlockNum.Int64())
 }
 
-func SyncBlocks(client *rpc.Client,db *sql.DB, blockChan chan *json.JsonHeader){
-	currentBlockNum:=blockdb.LastBlockNumber(db)
-
+func SyncBlocks(client *rpc.Client, db *sql.DB, blockChan chan *json.JsonHeader) {
+	currentBlockNum := blockdb.LastBlockNumber(db)
+	if currentBlockNum != 0 {
+		currentBlockNum = currentBlockNum + 1
+	}
 	lastBlockNum := getLastBlock(client)
 
+	fmt.Printf("current %#v last %#v \n", currentBlockNum, lastBlockNum.Int64())
 	//sync
-	FillBlockRange(client, blockChan, currentBlockNum, lastBlockNum.Int64())
+	if currentBlockNum <= lastBlockNum.Int64() {
+		fmt.Printf("sync block from %#v ,%#v \n ", currentBlockNum, lastBlockNum.Int64())
+		FillBlockRange(client, blockChan, currentBlockNum, lastBlockNum.Int64())
+		fmt.Printf("同步完成 \n")
+
+	}
+
 }
 
 /////////////////////////////////////
 //批量获取[start,end]之间的区块
-func FillBlockRange(client *rpc.Client, blockChan chan *json.JsonHeader, start, end int64) (done bool){
+func FillBlockRange(client *rpc.Client, blockChan chan *json.JsonHeader, start, end int64) {
 	step := int64(99)
 	i := int64(0)
 	for {
@@ -78,13 +87,11 @@ func FillBlockRange(client *rpc.Client, blockChan chan *json.JsonHeader, start, 
 		//loop
 		batchRequest(client, blockChan, start, i)
 		if i >= end {
+			fmt.Printf("i>=end i=%#v,end=%#v", i, end)
 			break
 		}
 		start = i + 1
 	}
-	done=true
-	return
-
 }
 
 func batchRequest(client *rpc.Client, blockChan chan *json.JsonHeader, start, end int64) {
