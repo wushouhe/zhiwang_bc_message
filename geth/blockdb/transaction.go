@@ -62,6 +62,5 @@ func transTx(tx *json.JsonTransaction) []interface{} {
 
 func txStr(t *json.JsonTransaction) string {
 	str := fmt.Sprintf(`%s,%s,%s,%s,%s,%s,%v,%s,%s,%s,%s,0x%x,0x%x,0x%x`, t.Hash.Hex(), t.BlockHash.Hex(), t.BlockNumber.ToInt(), t.From.Hex(), t.Recipient.Hex(), t.Amount, t.Payload, t.AccountNonce, t.TransactionIndex, t.Gas, t.GasPrice, t.V, t.R, t.S)
-	fmt.Println(str)
 	return str
 }

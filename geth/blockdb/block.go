@@ -38,6 +38,7 @@ func LastBlockNumber(db *sql.DB) int64 {
 		fmt.Printf("parse int64 error %v \n", err)
 		return int64(0)
 	}
+	fmt.Printf("last number from db is %s \n",lastNumber)
 	return i
 }
 
@@ -52,7 +53,6 @@ func transBlock(block *json.JsonHeader) []interface{} {
 
 func blockStr(block *json.JsonHeader) string {
 	str := fmt.Sprintf(`%s,%s,%#v,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%#x,%s,%#x,%s,%s`, block.Hash.Hex(), block.ParentHash.Hex(), block.Nonce.Uint64(), block.Number.ToInt(), block.Extra.String(), block.GasLimit.ToInt(), block.GasUsed.ToInt(), block.Coinbase.Hex(), block.MixDigest.Hex(), block.ReceiptHash.Hex(), block.Root.Hex(), block.UncleHash.Hex(), block.Bloom.Big(), block.Size.ToInt(), block.Difficulty.ToInt(), block.TotalDifficulty.ToInt(), block.Time.ToInt(), block.TxHash.Hex())
-	fmt.Println(str)
 	return str
 }
 
