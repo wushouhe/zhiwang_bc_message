@@ -9,10 +9,10 @@ import (
 )
 
 func main() {
-	client, _ := rpc.Dial("http://139.196.178.168:8545")
+	client, _ := rpc.Dial("http://172.16.10.163:8545")
 	blockChan := make(chan *json.JsonHeader, 100)
 	//subscribe.BatchRequest(client,blockChan,0,99)
-	subscribe.FillBlockRange(client,blockChan,4175,4175)
+	subscribe.FillBlockRange(client,blockChan,73906,73906)
 
 	for block := range blockChan {
 		//utils.PrintBlock(block)

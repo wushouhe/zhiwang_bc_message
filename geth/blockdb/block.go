@@ -2,11 +2,12 @@ package blockdb
 
 import (
 	"database/sql"
-	"log"
 	"zhiwang_bc_message/geth/json"
 	"fmt"
 	"strings"
 	"strconv"
+	"github.com/golang/glog"
+	"log"
 )
 
 func InsertBlock(db *sql.DB, block *json.JsonHeader) {
@@ -15,14 +16,37 @@ func InsertBlock(db *sql.DB, block *json.JsonHeader) {
 	 stateRoot, sha3Uncles, logsBloom, size, difficulty, totalDifficulty, timestamp, transactionsRoot)
 	 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
 	if e != nil {
-		fmt.Printf("stmt %v \n", e)
+		glog.Infof("stmt %v \n", e)
 	}
 	rows, err := stmt.Query(transBlock(block)...)
 	defer stmt.Close()
 	if err != nil {
-		log.Fatalf("insert data error: %v\n", err)
+		glog.Infof("insert data error: %v\n", err)
 	}
 	rows.Close()
+}
+
+func RemoveRepeatRows(db *sql.DB) {
+	stmt, err := db.Prepare(`delete from blocks
+				where number in (
+						select a.number
+						from
+						(
+							select	number
+							from blocks
+							group by number
+							having count(number) > 1
+						) a
+					)`)
+	defer stmt.Close()
+	if err != nil {
+		glog.Infof("stmt %v \n", err)
+	}
+	rows, err := stmt.Exec()
+	if err != nil {
+		log.Fatalf("insert data error: %v\n", err)
+	}
+	glog.Infof("affect rows %d \n",rows)
 }
 
 func LastBlockNumber(db *sql.DB) int64 {
@@ -30,15 +54,15 @@ func LastBlockNumber(db *sql.DB) int64 {
 	row := db.QueryRow("select number  from blocks order by number desc limit 0,1")
 	err := row.Scan(&lastNumber)
 	if err != nil {
-		fmt.Printf("last number err %v \n", err)
+		glog.Infof("last number err %v \n", err)
 		lastNumber = "0"
 	}
 	i, err := strconv.ParseInt(lastNumber, 10, 64)
 	if err != nil {
-		fmt.Printf("parse int64 error %v \n", err)
+		glog.Infof("parse int64 error %v \n", err)
 		return int64(0)
 	}
-	fmt.Printf("last number from db is %s \n",lastNumber)
+	glog.Infof("last number from db is %s \n", lastNumber)
 	return i
 }
 

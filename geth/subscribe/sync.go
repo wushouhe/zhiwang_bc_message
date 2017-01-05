@@ -3,11 +3,10 @@ package subscribe
 import (
 	"github.com/ethereum/go-ethereum/rpc"
 	"context"
-	"github.com/ethereum/go-ethereum/logger/glog"
+	"github.com/golang/glog"
 	"zhiwang_bc_message/geth/json"
 	"fmt"
 	"math/big"
-	//"zhiwang_bc_message/geth/utils"
 	"zhiwang_bc_message/geth/blockdb"
 	"database/sql"
 )
@@ -62,13 +61,11 @@ func SyncBlocks(client *rpc.Client, db *sql.DB, blockChan chan *json.JsonHeader)
 	}
 	lastBlockNum := getLastBlock(client)
 
-	fmt.Printf("current %#v last %#v \n", currentBlockNum, lastBlockNum.Int64())
+	glog.Infof("current %#v last %#v \n", currentBlockNum, lastBlockNum.Int64())
 	//sync
 	if currentBlockNum <= lastBlockNum.Int64() {
-		fmt.Printf("sync block from %#v ,%#v \n ", currentBlockNum, lastBlockNum.Int64())
 		FillBlockRange(client, blockChan, currentBlockNum, lastBlockNum.Int64())
-		fmt.Printf("同步完成 \n")
-
+		glog.Infof("同步完成 \n")
 	}
 
 }
@@ -87,7 +84,7 @@ func FillBlockRange(client *rpc.Client, blockChan chan *json.JsonHeader, start, 
 		//loop
 		batchRequest(client, blockChan, start, i)
 		if i >= end {
-			fmt.Printf("i>=end i=%#v,end=%#v", i, end)
+			glog.Infof("i>=end i=%#v,end=%#v", i, end)
 			break
 		}
 		start = i + 1
@@ -99,23 +96,75 @@ func batchRequest(client *rpc.Client, blockChan chan *json.JsonHeader, start, en
 	reqs := make([]rpc.BatchElem, length)
 	//request
 	for i := range reqs {
-		reqs[i] = rpc.BatchElem{
+		/*reqs[i] = rpc.BatchElem{
 			Method: "eth_getBlockByNumber",
 			Args:   []interface{}{toBlockNumArg(big.NewInt(start + int64(i))), true},
 			Result: &json.JsonHeader{},
-		}
+		}*/
+		reqs[i].Method = "eth_getBlockByNumber"
+		reqs[i].Args = []interface{}{toBlockNumArg(big.NewInt(start + int64(i))), true}
+		reqs[i].Result = &json.JsonHeader{}
 	}
 
 	if err := client.BatchCall(reqs); err != nil {
-		fmt.Printf("err %v", err)
+		glog.Errorf("err %v", err)
 	}
 
-	go func(rs []rpc.BatchElem) {
+	//go func(rs []rpc.BatchElem) {
+	//
+	//	for _, req := range rs {
+	//		blockChan <- req.Result.(*json.JsonHeader)
+	//	}
+	//}(reqs)
+	for _, req := range reqs {
+		blockChan <- req.Result.(*json.JsonHeader)
+	}
+	reqs = nil
 
-		for _, req := range rs {
-			blockChan <- req.Result.(*json.JsonHeader)
-			//utils.PrintBlock(req.Result.(*json.JsonHeader))
-		}
-	}(reqs)
 }
 
+
+//补全缺失区块
+func FillBlockRangeComplete(client *rpc.Client, blockChan chan *json.JsonHeader, list []int64) {
+	start := int64(0)
+	end := int64(len(list) - 1)
+
+	step := int64(99)
+	i := int64(0)
+	for {
+		i = start + step
+		if i > end {
+			i = end
+		}
+
+		//loop
+		batchRequestComplete(client, blockChan, start, i, list)
+		if i >= end {
+			glog.Infof("i>=end i=%#v,end=%#v", i, end)
+			break
+		}
+		start = i + 1
+	}
+}
+
+func batchRequestComplete(client *rpc.Client, blockChan chan *json.JsonHeader, start, end int64, list []int64) {
+	length := end - start + 1
+	reqs := make([]rpc.BatchElem, length)
+	//request
+	for i := range reqs {
+
+		reqs[i].Method = "eth_getBlockByNumber"
+		reqs[i].Args = []interface{}{toBlockNumArg(big.NewInt(list[start + int64(i)])), true}
+		reqs[i].Result = &json.JsonHeader{}
+	}
+
+	if err := client.BatchCall(reqs); err != nil {
+		glog.Errorf("err %v", err)
+	}
+
+	for _, req := range reqs {
+		blockChan <- req.Result.(*json.JsonHeader)
+	}
+	reqs = nil
+
+}

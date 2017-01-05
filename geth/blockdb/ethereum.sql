@@ -45,7 +45,7 @@ CREATE TABLE `blocks` (
   `receiptsRoot` varchar(255) DEFAULT NULL,
   `stateRoot` varchar(255) DEFAULT NULL,
   `sha3Uncles` varchar(255) DEFAULT NULL,
-  `logsBloom` varchar(255) DEFAULT NULL,
+  `logsBloom` text,
   `size` varchar(255) DEFAULT NULL,
   `difficulty` varchar(255) DEFAULT NULL,
   `totalDifficulty` varchar(255) DEFAULT NULL,

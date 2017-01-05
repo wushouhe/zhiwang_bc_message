@@ -2,11 +2,10 @@ package subscribe
 
 import (
 	"time"
-
 	"github.com/ethereum/go-ethereum/rpc"
 	"context"
 	"zhiwang_bc_message/geth/json"
-	"github.com/ethereum/go-ethereum/logger/glog"
+	"github.com/golang/glog"
 )
 
 //入口
@@ -36,7 +35,7 @@ func GetNewBlockIds(client *rpc.Client, filterId string, blockIdChan chan []stri
 		select {
 		case <-timer.C:
 			if err := client.CallContext(context.Background(), &result, "eth_getFilterChanges", filterId); err != nil {
-				glog.Infof("call eth_getFilterChanges error: %v", err)
+				glog.Errorf("call eth_getFilterChanges error: %v", err)
 				return
 			}
 			blockIdChan <- result
@@ -51,7 +50,7 @@ func GetNewBlockIds(client *rpc.Client, filterId string, blockIdChan chan []stri
 func SubscribeNewBlock(client *rpc.Client) (string, error) {
 	var result string
 	if err := client.CallContext(context.Background(), &result, "eth_newBlockFilter"); err != nil {
-		glog.Infof("call eth_newBlockFilter error: %v", err)
+		glog.Errorf("call eth_newBlockFilter error: %v", err)
 		return "", err
 	}
 	return result, nil
@@ -64,7 +63,7 @@ filterId RPC ID
 func UnSubscribeNewBlock(client *rpc.Client, filterId string) (bool, error) {
 	var result bool
 	if err := client.CallContext(context.Background(), &result, "eth_uninstallFilter"); err != nil {
-		glog.Infof("call eth_uninstallFilter error: %v", err)
+		glog.Errorf("call eth_uninstallFilter error: %v", err)
 		return false, err
 	}
 	return result, nil
@@ -82,17 +81,10 @@ func BlockDetail(client *rpc.Client, blockIdChan chan []string, blockChan chan *
 			for _, blockId := range blockIds {
 				block, err := BlockDetailByHash(client, blockId)
 				if err != nil {
-					glog.Infof("BlockDetail error: %v", err)
+					glog.Errorf("BlockDetail error: %v", err)
 					return
 				}
-				Loop:
-				for {
-					select {
-					case blockChan <- block:
-						break Loop
-					}
-				}
-
+				blockChan <- block
 			}
 		}
 	}
@@ -105,7 +97,7 @@ blockId block hash
 func BlockDetailByHash(client *rpc.Client, blockId string) (*json.JsonHeader, error) {
 	var block json.JsonHeader = json.JsonHeader{}
 	if err := client.CallContext(context.Background(), &block, "eth_getBlockByHash", blockId, true); err != nil {
-		glog.Infof("call eth_getBlockByHash error: %v", err)
+		glog.Errorf("call eth_getBlockByHash error: %v", err)
 		return nil, err
 	}
 	return &block, nil
