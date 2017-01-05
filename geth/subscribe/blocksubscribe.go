@@ -12,7 +12,7 @@ import (
 func ListenNewBlock(client *rpc.Client, blockChan chan *json.JsonHeader) {
 	//订阅
 	filterId, _ := SubscribeNewBlock(client)
-	defer UnSubscribeNewBlock(client, filterId)
+	//defer UnSubscribeNewBlock(client, filterId)
 
 	//监听new block
 	blockIdChan := make(chan []string)
@@ -62,7 +62,7 @@ filterId RPC ID
  */
 func UnSubscribeNewBlock(client *rpc.Client, filterId string) (bool, error) {
 	var result bool
-	if err := client.CallContext(context.Background(), &result, "eth_uninstallFilter"); err != nil {
+	if err := client.CallContext(context.Background(), &result, "eth_uninstallFilter",filterId); err != nil {
 		glog.Errorf("call eth_uninstallFilter error: %v", err)
 		return false, err
 	}

@@ -7,7 +7,6 @@ import (
 	"strings"
 	"strconv"
 	"github.com/golang/glog"
-	"log"
 )
 
 func InsertBlock(db *sql.DB, block *json.JsonHeader) {
@@ -24,6 +23,21 @@ func InsertBlock(db *sql.DB, block *json.JsonHeader) {
 		glog.Infof("insert data error: %v\n", err)
 	}
 	rows.Close()
+}
+
+func InsertBlockBatch(tx *sql.Tx, block *json.JsonHeader) {
+
+	stmt, e := tx.Prepare(`INSERT INTO blocks (hash, parentHash, nonce, number, extraData, gasLimit, gasUsed, miner, mixHash, receiptsRoot,
+	 stateRoot, sha3Uncles, logsBloom, size, difficulty, totalDifficulty, timestamp, transactionsRoot)
+	 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+	if e != nil {
+		glog.Infof("stmt %v \n", e)
+	}
+	_, err := stmt.Exec(transBlock(block)...)
+	defer stmt.Close()
+	if err != nil {
+		glog.Infof("insert data error: %v\n", err)
+	}
 }
 
 func RemoveRepeatRows(db *sql.DB) {
@@ -44,14 +58,15 @@ func RemoveRepeatRows(db *sql.DB) {
 	}
 	rows, err := stmt.Exec()
 	if err != nil {
-		log.Fatalf("insert data error: %v\n", err)
+		glog.Infof("insert data error: %v\n", err)
 	}
-	glog.Infof("affect rows %d \n",rows)
+	affectedCount, _ := rows.RowsAffected()
+	glog.Infof("affect rows %d \n", affectedCount)
 }
 
 func LastBlockNumber(db *sql.DB) int64 {
 	var lastNumber string
-	row := db.QueryRow("select number  from blocks order by number desc limit 0,1")
+	row := db.QueryRow("select max(number)  from blocks ")
 	err := row.Scan(&lastNumber)
 	if err != nil {
 		glog.Infof("last number err %v \n", err)
@@ -65,6 +80,25 @@ func LastBlockNumber(db *sql.DB) int64 {
 	glog.Infof("last number from db is %s \n", lastNumber)
 	return i
 }
+
+
+func MinBlockNumber(db *sql.DB) int64 {
+	var lastNumber string
+	row := db.QueryRow("select min(number)  from blocks ")
+	err := row.Scan(&lastNumber)
+	if err != nil {
+		glog.Infof("min number err %v \n", err)
+		lastNumber = "0"
+	}
+	i, err := strconv.ParseInt(lastNumber, 10, 64)
+	if err != nil {
+		glog.Infof("parse int64 error %v \n", err)
+		return int64(0)
+	}
+	glog.Infof("min number from db is %s \n", lastNumber)
+	return i
+}
+
 
 func transBlock(block *json.JsonHeader) []interface{} {
 	blockStrs := strings.Split(blockStr(block), ",")

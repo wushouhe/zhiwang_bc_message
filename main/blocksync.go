@@ -8,21 +8,16 @@ import (
 	"time"
 	"github.com/golang/glog"
 	"flag"
-	//"sync"
-	"zhiwang_bc_message/geth/complete"
+	"zhiwang_bc_message/geth/lostblock"
 	"sync"
 )
 
 func main() {
 	flag.Parse()
-	client, _ := rpc.Dial("http://172.16.10.163:8545")
+	client, _ := rpc.Dial("http://139.196.178.168:8545")
 	blockChan := make(chan *json.JsonHeader, 1000)
 	db := blockdb.NewDB()
-	glog.Infof("删除重复区块")
-	blockdb.RemoveRepeatRows(db)
-	glog.Infof("检查缺失区块")
-	lostList := complete.MysqlLoop(db)
-	subscribe.FillBlockRangeComplete(client, blockChan, lostList)
+	lostblock.SyncLostBlock(client, db, blockChan)
 	glog.Info("开始同步区块...")
 	go func() {
 		for {

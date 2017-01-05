@@ -1,4 +1,4 @@
-package complete
+package lostblock
 
 import (
 	"database/sql"
@@ -6,11 +6,13 @@ import (
 	"strconv"
 )
 
+//接口
 type Data interface {
 	Get(index int64) int64
 	Len() int64
 }
 
+//mysql
 type MysqlData struct {
 	db *sql.DB
 }
@@ -61,6 +63,7 @@ func (mysql *MysqlData) Len() int64 {
 	return i
 }
 
+//array
 type ArrayData struct {
 	list []int64
 }

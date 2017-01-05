@@ -1,4 +1,4 @@
-package complete
+package lostblock
 
 import (
 	"github.com/golang/glog"
@@ -6,6 +6,7 @@ import (
 	"zhiwang_bc_message/geth/container/stack"
 	"database/sql"
 	"time"
+	"fmt"
 )
 
 //var data = [10]int{1, 2, 5, 6, 9,
@@ -15,8 +16,8 @@ import (
 二分法
  */
 func TestBinary() {
-
-	//binarySearch(0, 9)
+	data := NewArrayData()
+	binarySearch(int64(0), data.Len()-1,data)
 }
 
 /**
@@ -98,14 +99,14 @@ func loop(stack *stack.Stack, data Data) ([]int64) {
 /**
 递归算法
  */
-/*func binarySearch(low, high int) {
+func binarySearch(low, high int64, data Data) {
 	glog.Infof("low %d high %d \n", low, high)
 	if high - low == 0 {
 		return
 	}
 	if high - low == 1 {
-		lowValue := data[low]
-		highValue := data[high]
+		lowValue := data.Get(low)
+		highValue := data.Get(high)
 		glog.Infof("lowValue %d highValue %d \n", lowValue, highValue)
 		for i := (lowValue + 1); i < highValue; i++ {
 			fmt.Printf("value %d \n", i)
@@ -113,23 +114,23 @@ func loop(stack *stack.Stack, data Data) ([]int64) {
 		return
 	}
 
-	totalComplete := check(low, high, data[low], data[high])
+	totalComplete := check(low, high, data.Get(low), data.Get(high))
 	glog.Infof("totalComplete %v low %d high %d \n", totalComplete, low, high)
 	if totalComplete == false {
 		mid := (high - low) / 2
-		leftComplete := check(low, low + mid, data[low], data[low + mid])
+		leftComplete := check(low, low + mid, data.Get(low), data.Get(low + mid))
 		glog.Infof("leftComplete %v low %d high %d \n", leftComplete, low, low + mid)
 		if leftComplete == false {
-			binarySearch(low, low + mid)
+			binarySearch(low, low + mid,data)
 		}
-		rightComlete := check(low + mid, high, data[low + mid], data[high])
+		rightComlete := check(low + mid, high, data.Get(low + mid), data.Get(high))
 		glog.Infof("rightComlete %v low %d high %d \n", rightComlete, low + mid, high)
 		if rightComlete == false {
-			binarySearch(low + mid, high)
+			binarySearch(low + mid, high,data)
 		}
 	}
 
-}*/
+}
 
 func check(indexStart, indexEnd int64, firstValue, lastValue int64) bool {
 	indexLen := indexEnd - indexStart + 1

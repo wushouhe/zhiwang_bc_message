@@ -52,6 +52,47 @@ func InsertTransactions(db *sql.DB, txs []*json.JsonTransaction) {
 	defer stmt.Close()
 
 }
+
+func InsertTransactionsBatch(tx *sql.Tx, txs []*json.JsonTransaction) {
+	stmt, err := tx.Prepare(`
+	INSERT INTO transactions (hash,
+			blockHash,
+			blockNumber,
+			tx_from,
+			tx_to,
+			value,
+			input,
+			nonce,
+			transactionIndex,
+			gas,
+			gasPrice,
+			v,
+			r,
+			s)
+	 VALUES (?,
+		?,
+		?,
+		?,
+		?,
+		?,
+		?,
+		?,
+		?,
+		?,
+		?,
+		?,
+		?,
+		?)`)
+	if err != nil {
+		glog.Errorf("stmt err %v \n", err)
+	}
+	for _, tx := range txs {
+		stmt.Exec(transTx(tx)...)
+	}
+	defer stmt.Close()
+
+}
+
 func InsertTransaction(db *sql.DB, tx *json.JsonTransaction) {
 
 	stmt, e := db.Prepare(`
