@@ -4,14 +4,11 @@ import (
 	"io/ioutil"
 	"fmt"
 	"gopkg.in/yaml.v2"
+	"zhiwang_bc_message/geth/config"
 )
 
-type Config struct {
-	Mysql map[string]string `yaml:mysql`
-}
-
 func main() {
-	var config Config
+	var config config.Config
 	source, err := ioutil.ReadFile("D:/mygo/src/zhiwang_bc_message/cfg/config.yaml")
 	if err != nil {
 		fmt.Println(err)
@@ -20,5 +17,7 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Printf(config.Mysql["ip"])
+	fmt.Println(config.Mysql.Username)
+	fmt.Println(config.RPC.Protocol)
+	fmt.Println(config.ThreadSize)
 }
