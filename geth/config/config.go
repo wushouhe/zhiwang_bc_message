@@ -2,23 +2,21 @@ package config
 
 type Config struct {
 	Mysql        struct {
-			     Ip       string `yaml:ip`
-			     Port     string `yaml:port`
-			     Username string `yaml:username`
-			     Passwd   string `yaml:passwd`
-			     BaseName string `yaml:baseName`
+			     Ip       string `yaml:"ip"`
+			     Port     string `yaml:"port"`
+			     Username string `yaml:"username"`
+			     Passwd   string `yaml:"passwd"`
+			     BaseName string `yaml:"baseName"`
 		     }
 
 	RPC          struct {
-			     Protocol string `yaml:protocol`
-			     Ip       string `yaml:ip`
-			     Port     string `yaml:port`
+			     Protocol string `yaml:"protocol"`
+			     Ip       string `yaml:"ip"`
+			     Port     string `yaml:"port"`
 		     }
 
 	BlocChanSize int `yaml:"blocChanSize"`
 	ThreadSize   int `yaml:"threadSize"`
 }
 
-func init() {
-
-}
+var Cfg Config

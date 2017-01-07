@@ -6,22 +6,16 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"zhiwang_bc_message/geth/json"
 	"github.com/golang/glog"
+	. "zhiwang_bc_message/geth/config"
 )
 
-var (
-	/*ip = "172.16.10.162:3306"//IP地址
-	username = "root"//用户名
-	passwd = "123456"//密码
-	dbname = "zw_bc"//库名*/
 
-	ip = "127.0.0.1:3306"//IP地址
-	username = "root"//用户名
-	passwd = "root"//密码
-	dbname = "ethereum"//库名
-)
 
 func NewDB() *sql.DB {
-	db, _ := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", username, passwd, ip, dbname))
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", Cfg.Mysql.Username, Cfg.Mysql.Passwd, Cfg.Mysql.Ip, Cfg.Mysql.Port, Cfg.Mysql.BaseName))
+	if err != nil {
+		glog.Infof("create db error %v ", err)
+	}
 	return db
 }
 
