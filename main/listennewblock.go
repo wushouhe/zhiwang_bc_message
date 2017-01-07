@@ -23,8 +23,7 @@ var (
 )
 
 func init() {
-	// Initialize the CLI app and start Geth
-	app.Action = geth
+	app.Action = listenNewBlock
 	app.Copyright = "Copyright 2017 "
 	/*app.Commands = []cli.Command{
 		syncBlockCommand,
@@ -48,14 +47,13 @@ func init() {
 }
 
 func main() {
-
 	if err := app.Run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
 
-func geth(ctx *cli.Context) error {
+func listenNewBlock(ctx *cli.Context) error {
 	//解析配置文件
 	err := utils.ReadConfig(ctx)
 	if err != nil {
