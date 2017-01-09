@@ -77,7 +77,6 @@ func lostBlock(ctx *cli.Context) error {
 	go subscribe.FillBlockRangeComplete(client, blockChan, lostList)
 
 	i := 0
-	fmt.Println("i")
 	for block := range blockChan {
 
 		if i >= lostBlockLen {
