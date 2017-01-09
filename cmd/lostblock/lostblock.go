@@ -77,14 +77,16 @@ func lostBlock(ctx *cli.Context) error {
 	go subscribe.FillBlockRangeComplete(client, blockChan, lostList)
 
 	i := 0
+	fmt.Println("i")
 	for block := range blockChan {
-		i++
+
 		if i >= lostBlockLen {
 			close(blockChan)
 			break
 		}
 		glog.Infof("%s \n", block.Number.ToInt())
 		blockdb.InesrtBlockChan(db, block)
+		i++
 	}
 	return nil
 }
