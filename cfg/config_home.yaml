@@ -1,12 +1,12 @@
 mysql:
-    ip: 172.16.10.162
+    ip: 127.0.0.1
     port: 3306
     username: root
-    passwd: 123456
-    baseName: zw_bc
+    passwd: root
+    baseName: ethereum
 rpc:
     protocol: http
-    ip: 172.16.10.163
+    ip: 139.196.178.168
     port: 8545
 blocChanSize: 200
 threadSize: 10
