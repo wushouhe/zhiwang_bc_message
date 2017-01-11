@@ -99,7 +99,7 @@ CREATE TABLE `transactions` (
   `blockHash` varchar(255) DEFAULT NULL,
   `blockNumber` varchar(255) DEFAULT NULL,
   `tx_from` varchar(255) DEFAULT NULL,
-  `tx_to` varchar(255) DEFAULT NULL,
+  `tx_to` bigint(255) DEFAULT NULL,
   `value` varchar(255) DEFAULT NULL,
   `input` varchar(255) DEFAULT NULL,
   `nonce` varchar(255) DEFAULT NULL,

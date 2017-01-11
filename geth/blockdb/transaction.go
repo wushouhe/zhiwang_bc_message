@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"github.com/golang/glog"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 func InsertTransactions(db *sql.DB, txs []*json.JsonTransaction) {
@@ -19,6 +20,7 @@ func InsertTransactions(db *sql.DB, txs []*json.JsonTransaction) {
 			blockNumber,
 			tx_from,
 			tx_to,
+			isContract,
 			value,
 			input,
 			nonce,
@@ -29,6 +31,7 @@ func InsertTransactions(db *sql.DB, txs []*json.JsonTransaction) {
 			r,
 			s)
 	 VALUES (?,
+		?,
 		?,
 		?,
 		?,
@@ -60,6 +63,7 @@ func InsertTransactionsBatch(tx *sql.Tx, txs []*json.JsonTransaction) {
 			blockNumber,
 			tx_from,
 			tx_to,
+			isContract,
 			value,
 			input,
 			nonce,
@@ -70,6 +74,7 @@ func InsertTransactionsBatch(tx *sql.Tx, txs []*json.JsonTransaction) {
 			r,
 			s)
 	 VALUES (?,
+		?,
 		?,
 		?,
 		?,
@@ -101,6 +106,7 @@ func InsertTransaction(db *sql.DB, tx *json.JsonTransaction) {
 			blockNumber,
 			tx_from,
 			tx_to,
+			isContract,
 			value,
 			input,
 			nonce,
@@ -111,6 +117,7 @@ func InsertTransaction(db *sql.DB, tx *json.JsonTransaction) {
 			r,
 			s)
 	 VALUES (?,
+		?,
 		?,
 		?,
 		?,
@@ -148,11 +155,12 @@ func transTx(tx *json.JsonTransaction) []interface{} {
 
 func txStr(t *json.JsonTransaction) string {
 	var str string
+	var isContract string = "false"
 	if t.Recipient == nil {
-		str = fmt.Sprintf(`%s,%s,%s,%s,%s,%s,%v,%s,%s,%s,%s,0x%x,0x%x,0x%x`, t.Hash.Hex(), t.BlockHash.Hex(), t.BlockNumber.ToInt(), t.From.Hex(), "", t.Amount, t.Payload, t.AccountNonce, t.TransactionIndex, t.Gas, t.GasPrice, t.V, t.R, t.S)
-	} else {
-		str = fmt.Sprintf(`%s,%s,%s,%s,%s,%s,%v,%s,%s,%s,%s,0x%x,0x%x,0x%x`, t.Hash.Hex(), t.BlockHash.Hex(), t.BlockNumber.ToInt(), t.From.Hex(), t.Recipient.Hex(), t.Amount, t.Payload, t.AccountNonce, t.TransactionIndex, t.Gas, t.GasPrice, t.V, t.R, t.S)
-
+		t.Recipient = &common.Address{}
+		isContract = "true"
 	}
+	str = fmt.Sprintf(`%s,%s,%s,%s,%s,%s,%s,%v,%s,%s,%s,%s,0x%x,0x%x,0x%x`, t.Hash.Hex(), t.BlockHash.Hex(), t.BlockNumber.ToInt(), t.From.Hex(), t.Recipient.Hex(),isContract, t.Amount, t.Payload, t.AccountNonce, t.TransactionIndex, t.Gas, t.GasPrice, t.V, t.R, t.S)
+	fmt.Println(str)
 	return str
 }

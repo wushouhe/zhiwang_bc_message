@@ -18,7 +18,7 @@ type JsonTransaction struct {
 	AccountNonce     *hexutil.Uint64        `json:"nonce"`
 	GasPrice         *hexutil.Big        `json:"gasPrice"`
 	Gas              *hexutil.Big        `json:"gas"`
-	Recipient        *common.Address        `json:"to"`
+	Recipient        *common.Address        `json:"to,omitempty"`
 	Amount           *hexutil.Big        `json:"value"`
 	Payload          *hexutil.Bytes        `json:"input"`
 	V                *hexutil.Big        `json:"v"`
@@ -27,6 +27,11 @@ type JsonTransaction struct {
 }
 
 func (t *JsonTransaction) String() string {
+	var isContract bool = false
+	if t.Recipient == nil {
+		t.Recipient = &common.Address{}
+		isContract = true
+	}
 	str := fmt.Sprintf(`
 			BlockHash %s
 			BlockNumber %s
@@ -37,6 +42,7 @@ func (t *JsonTransaction) String() string {
 			GasPrice %s
 			Gas %s
 			Recipient %s
+			isContract %v
 			Amount %s
 			Payload %v
 			V 0x%x
@@ -51,6 +57,7 @@ func (t *JsonTransaction) String() string {
 		t.GasPrice,
 		t.Gas,
 		t.Recipient.Hex(),
+		isContract,
 		t.Amount,
 		t.Payload,
 		t.V,
@@ -76,7 +83,7 @@ type JsonHeader struct {
 	Extra           *hexutil.Bytes        `json:"extraData"`
 	MixDigest       *common.Hash        `json:"mixHash"`
 	Nonce           *types.BlockNonce        `json:"nonce"`
-	Transactions    []*JsonTransaction        `json:transactions`
+	Transactions    []*JsonTransaction        `json:transactions,omitempty`
 	Size            *hexutil.Big                `json:size`
 	TotalDifficulty *hexutil.Big                `json:totalDifficulty`
 	Hash            *common.Hash                `json:hash`
@@ -100,7 +107,7 @@ func (block *JsonHeader) String() string {
 			root %s
 			time %s
 			size %#x
-			totalDifficultyv %#x
+			totalDifficulty %#x
 			hash %s
 			Transactions %v `,
 		block.Coinbase.Hex(),
