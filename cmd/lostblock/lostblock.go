@@ -61,6 +61,8 @@ func lostBlock(ctx *cli.Context) error {
 	blockChan := make(chan *json.JsonHeader, Cfg.BlocChanSize)
 
 	db := blockdb.NewDB()
+	db.SetMaxOpenConns(Cfg.ThreadSize)
+	db.SetMaxIdleConns(Cfg.ThreadSize)
 
 	//删除重复数据
 	glog.Infof("删除重复区块")

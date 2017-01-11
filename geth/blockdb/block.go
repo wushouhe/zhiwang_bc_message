@@ -11,30 +11,35 @@ import (
 
 func InsertBlock(db *sql.DB, block *json.JsonHeader) {
 
-	stmt, e := db.Prepare(`INSERT INTO blocks (hash, parentHash, nonce, number, extraData, gasLimit, gasUsed, miner, mixHash, receiptsRoot,
+	stmt, err := db.Prepare(`INSERT INTO blocks (hash, parentHash, nonce, number, extraData, gasLimit, gasUsed, miner, mixHash, receiptsRoot,
 	 stateRoot, sha3Uncles, logsBloom, size, difficulty, totalDifficulty, timestamp, transactionsRoot)
 	 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-	if e != nil {
-		glog.Infof("stmt %v \n", e)
+	defer func() {
+		err := stmt.Close()
+		if err != nil {
+			glog.Infof("stmt %v \n", err)
+		}
+	}()
+	if err != nil {
+		glog.Infof("stmt %v \n", err)
 	}
 	rows, err := stmt.Query(transBlock(block)...)
-	defer stmt.Close()
+	defer rows.Close()
 	if err != nil {
 		glog.Infof("insert data error: %v\n", err)
 	}
-	rows.Close()
 }
 
 func InsertBlockBatch(tx *sql.Tx, block *json.JsonHeader) {
 
-	stmt, e := tx.Prepare(`INSERT INTO blocks (hash, parentHash, nonce, number, extraData, gasLimit, gasUsed, miner, mixHash, receiptsRoot,
+	stmt, err := tx.Prepare(`INSERT INTO blocks (hash, parentHash, nonce, number, extraData, gasLimit, gasUsed, miner, mixHash, receiptsRoot,
 	 stateRoot, sha3Uncles, logsBloom, size, difficulty, totalDifficulty, timestamp, transactionsRoot)
 	 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-	if e != nil {
-		glog.Infof("stmt %v \n", e)
-	}
-	_, err := stmt.Exec(transBlock(block)...)
 	defer stmt.Close()
+	if err != nil {
+		glog.Infof("stmt %v \n", err)
+	}
+	_, err = stmt.Exec(transBlock(block)...)
 	if err != nil {
 		glog.Infof("insert data error: %v\n", err)
 	}

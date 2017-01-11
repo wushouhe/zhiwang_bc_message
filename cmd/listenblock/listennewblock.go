@@ -70,6 +70,8 @@ func listenNewBlock(ctx *cli.Context) error {
 	subscribe.ListenNewBlock(client, blockChan)
 
 	db := blockdb.NewDB()
+	db.SetMaxOpenConns(Cfg.ThreadSize)
+	db.SetMaxIdleConns(Cfg.ThreadSize)
 
 	lostBlockFunc := func() {
 		lostblock.SyncLostBlock(client, db, blockChan)

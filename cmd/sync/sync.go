@@ -1,23 +1,24 @@
 package main
+
 /**
 --config D:/mygo/src/zhiwang_bc_message/cfg/config.yaml  --alsologtostderr=true
- */
+*/
 import (
-	cmdutil "github.com/17golang/golang/cmd/utils"
-	"gopkg.in/urfave/cli.v1"
-	"github.com/17golang/golang/goutils/config"
-	. "zhiwang_bc_message/geth/config"
-	"zhiwang_bc_message/geth/utils"
-	"os"
 	"fmt"
+	cmdutil "github.com/17golang/golang/cmd/utils"
+	"github.com/17golang/golang/goutils/config"
+	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/golang/glog"
+	"gopkg.in/urfave/cli.v1"
+	"os"
 	"sync"
+	"time"
 	"zhiwang_bc_message/geth/blockdb"
+	. "zhiwang_bc_message/geth/config"
+	"zhiwang_bc_message/geth/json"
 	"zhiwang_bc_message/geth/lostblock"
 	"zhiwang_bc_message/geth/subscribe"
-	"time"
-	"github.com/ethereum/go-ethereum/rpc"
-	"zhiwang_bc_message/geth/json"
-	"github.com/golang/glog"
+	"zhiwang_bc_message/geth/utils"
 )
 
 var (
@@ -41,10 +42,14 @@ func syncBlocks(ctx *cli.Context) error {
 		return err
 	}
 	cmdutil.GlogShim(ctx)
-	fmt.Printf("%v \n",Cfg)
+	fmt.Printf("%v \n", Cfg)
 	client, _ := rpc.Dial(fmt.Sprintf("%s://%s:%s", Cfg.RPC.Protocol, Cfg.RPC.Ip, Cfg.RPC.Port))
 	blockChan := make(chan *json.JsonHeader, Cfg.BlocChanSize)
+
 	db := blockdb.NewDB()
+	db.SetMaxOpenConns(Cfg.ThreadSize)
+	db.SetMaxIdleConns(Cfg.ThreadSize)
+
 	lostblock.SyncLostBlock(client, db, blockChan)
 	glog.Info("开始同步区块...")
 	go func() {

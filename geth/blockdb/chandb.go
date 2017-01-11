@@ -29,9 +29,7 @@ func InesrtBlockChan(db *sql.DB, block *json.JsonHeader) {
 
 
 	InsertBlock(db, block)
-	for _, tx := range block.Transactions {
-		InsertTransaction(db, tx)
-	}
+	InsertTransactions(db,block.Transactions)
 
 }
 
