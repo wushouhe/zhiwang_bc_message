@@ -1,6 +1,7 @@
 package main
 
 import (
+	cmdutil "github.com/17golang/golang/cmd/utils"
 	"zhiwang_bc_message/geth/lostblock"
 	"zhiwang_bc_message/geth/blockdb"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -12,35 +13,20 @@ import (
 	. "zhiwang_bc_message/geth/config"
 	"zhiwang_bc_message/geth/utils"
 	"gopkg.in/urfave/cli.v1"
-	"runtime"
 )
 
 var (
-	app = utils.NewApp("zhiwang message midware command line interface")
+	app = cmdutil.NewApp("检查丢失区块接口")
 )
 
 func init() {
 	app.Action = lostBlock
 	app.Copyright = "Copyright 2017 "
 
-	app.Flags = []cli.Flag{
-		utils.ConfigFileFlag,
-	}
-	app.Flags = append(app.Flags, utils.GlogGangstaFlags...)
-
-	app.Before = func(ctx *cli.Context) error {
-		runtime.GOMAXPROCS(runtime.NumCPU())
-		return nil
-	}
-
-	app.After = func(ctx *cli.Context) error {
-		glog.Flush()
-		return nil
-	}
+	app.AddFlag(utils.ConfigFileFlag)
 }
 
 func main() {
-	app.Action = lostBlock
 	if err := app.Run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

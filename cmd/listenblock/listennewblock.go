@@ -1,6 +1,7 @@
 package main
 
 import (
+	cmdutil "github.com/17golang/golang/cmd/utils"
 	"github.com/ethereum/go-ethereum/rpc"
 	"zhiwang_bc_message/geth/json"
 	"zhiwang_bc_message/geth/subscribe"
@@ -13,13 +14,12 @@ import (
 	"fmt"
 	"gopkg.in/urfave/cli.v1"
 	"os"
-	"runtime"
 )
 
 var once sync.Once
 
 var (
-	app = utils.NewApp("zhiwang message midware command line interface")
+	app = cmdutil.NewApp("指旺区块监听接口")
 )
 
 func init() {
@@ -30,20 +30,7 @@ func init() {
 		lostBlockCommand,
 	}*/
 
-	app.Flags = []cli.Flag{
-		utils.ConfigFileFlag,
-	}
-	app.Flags = append(app.Flags, utils.GlogGangstaFlags...)
-
-	app.Before = func(ctx *cli.Context) error {
-		runtime.GOMAXPROCS(runtime.NumCPU())
-		return nil
-	}
-
-	app.After = func(ctx *cli.Context) error {
-		glog.Flush()
-		return nil
-	}
+	app.AddFlag(utils.ConfigFileFlag)
 }
 
 func main() {
@@ -94,7 +81,3 @@ func listenNewBlock(ctx *cli.Context) error {
 
 	return nil
 }
-
-
-
-
